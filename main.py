@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import anthropic
 import httpx
+from faster_whisper import WhisperModel
 
 app = FastAPI()
 
@@ -33,30 +34,15 @@ anthropic_client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
 
 def transcribe_video(video_path: str) -> list[dict]:
-    """Use Whisper to transcribe video and get word-level timestamps."""
-    result = subprocess.run(
-        [
-            "whisper", video_path,
-            "--model", "base",
-            "--output_format", "json",
-            "--word_timestamps", "True",
-            "--output_dir", str(UPLOAD_DIR)
-        ],
-        capture_output=True, text=True
-    )
-    if result.returncode != 0:
-        raise RuntimeError(f"Whisper failed: {result.stderr}")
-
-    json_path = UPLOAD_DIR / (Path(video_path).stem + ".json")
-    with open(json_path) as f:
-        data = json.load(f)
-
+    """Use faster-whisper to transcribe video and get timestamps."""
+    model = WhisperModel("base", device="cpu", compute_type="int8")
+    segments_iter, _ = model.transcribe(video_path, beam_size=5)
     segments = []
-    for seg in data.get("segments", []):
+    for seg in segments_iter:
         segments.append({
-            "start": seg["start"],
-            "end": seg["end"],
-            "text": seg["text"].strip()
+            "start": seg.start,
+            "end": seg.end,
+            "text": seg.text.strip()
         })
     return segments
 

@@ -149,8 +149,8 @@ def cut_clip_with_subtitles(video_path: str, start: float, end: float, output_pa
 
     # Build filter chain
     filters = [
-        "scale=1080:1920:force_original_aspect_ratio=decrease",
-        "pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black"
+        "scale=720:1280:force_original_aspect_ratio=decrease",
+        "pad=720:1280:(ow-iw)/2:(oh-ih)/2:black"
     ]
 
     if segments:
@@ -167,7 +167,7 @@ def cut_clip_with_subtitles(video_path: str, start: float, end: float, output_pa
         "-i", video_path,
         "-t", str(duration),
         "-vf", filter_str,
-        "-c:v", "libx264", "-crf", "23", "-preset", "fast",
+        "-c:v", "libx264", "-crf", "28", "-preset", "ultrafast",
         "-c:a", "aac", "-b:a", "128k",
         output_path
     ]

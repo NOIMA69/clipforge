@@ -147,10 +147,10 @@ def cut_clip_with_subtitles(video_path: str, start: float, end: float, output_pa
     # Create SRT file
     create_srt(segments, srt_path)
 
-    # Build filter chain
+    # Build filter chain — crop to fill 9:16 (no black bars)
     filters = [
-        "scale=720:1280:force_original_aspect_ratio=decrease",
-        "pad=720:1280:(ow-iw)/2:(oh-ih)/2:black"
+        "scale=720:1280:force_original_aspect_ratio=increase",
+        "crop=720:1280"
     ]
 
     if segments:

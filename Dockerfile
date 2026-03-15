@@ -12,9 +12,6 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download the whisper model so first request is fast
-RUN python3 -c "from faster_whisper import WhisperModel; WhisperModel('tiny', device='cpu', compute_type='int8')"
-
 COPY . .
 
 RUN mkdir -p uploads outputs
